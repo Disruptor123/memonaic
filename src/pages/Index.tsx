@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowRight, Zap, Shield, Database, Coins, Users, Code, Brain, BookOpen, Network } from "lucide-react";
+import { Link } from "react-router-dom";
 import AnimatedBackground from "@/components/AnimatedBackground";
 import AnimatedText from "@/components/AnimatedText";
 import FeatureCard from "@/components/FeatureCard";
@@ -93,10 +94,12 @@ const Index = () => {
               Built on Avalanche, Memonaic stores encrypted memories, knowledge graphs, and semantic data on-chain while powering the next generation of AI training and scientific research.
             </p>
             <div className={`flex flex-col sm:flex-row gap-4 justify-center transform transition-all duration-1000 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <Button size="lg" className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25">
-                Launch App
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <Link to="/dashboard">
+                <Button size="lg" className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25">
+                  Launch App
+                  <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
               <Button variant="outline" size="lg" className="border-red-500 text-red-300 hover:bg-red-500/10 py-4 px-8 rounded-full">
                 Learn More
               </Button>
@@ -211,10 +214,12 @@ const Index = () => {
           <p className="text-xl text-gray-300 mb-8">
             Join the Memonaic ecosystem and start earning tokens by contributing valuable data to the on-chain knowledge base.
           </p>
-          <Button size="lg" className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25">
-            Launch App
-            <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
+          <Link to="/dashboard">
+            <Button size="lg" className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25">
+              Launch App
+              <ArrowRight className="ml-2 h-5 w-5" />
+            </Button>
+          </Link>
         </div>
       </section>
 
