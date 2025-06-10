@@ -19,7 +19,7 @@ const AnimatedBackground = () => {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
-    // Particle system
+    // Particle system with red theme
     const particles: Array<{
       x: number;
       y: number;
@@ -30,23 +30,123 @@ const AnimatedBackground = () => {
       color: string;
     }> = [];
 
-    const colors = ["#8b5cf6", "#ec4899", "#06b6d4", "#10b981"];
+    // Red futuristic color palette
+    const colors = ["#dc2626", "#ef4444", "#f97316", "#facc15", "#fb7185"];
 
     // Create particles
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 80; i++) {
       particles.push({
         x: Math.random() * canvas.width,
         y: Math.random() * canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        size: Math.random() * 3 + 1,
-        opacity: Math.random() * 0.5 + 0.2,
+        vx: (Math.random() - 0.5) * 0.8,
+        vy: (Math.random() - 0.5) * 0.8,
+        size: Math.random() * 4 + 1,
+        opacity: Math.random() * 0.7 + 0.3,
         color: colors[Math.floor(Math.random() * colors.length)]
       });
     }
 
+    // Futuristic city buildings
+    const buildings: Array<{
+      x: number;
+      width: number;
+      height: number;
+      lights: Array<{ x: number; y: number; opacity: number }>;
+    }> = [];
+
+    // Create city skyline
+    for (let i = 0; i < 15; i++) {
+      const building = {
+        x: (canvas.width / 15) * i,
+        width: canvas.width / 15 + Math.random() * 20,
+        height: Math.random() * 200 + 100,
+        lights: [] as Array<{ x: number; y: number; opacity: number }>
+      };
+
+      // Add lights to buildings
+      for (let j = 0; j < Math.random() * 8 + 3; j++) {
+        building.lights.push({
+          x: building.x + Math.random() * building.width,
+          y: canvas.height - Math.random() * building.height,
+          opacity: Math.random()
+        });
+      }
+
+      buildings.push(building);
+    }
+
+    // Globe animation variables
+    let globeRotation = 0;
+    const globeX = canvas.width * 0.8;
+    const globeY = canvas.height * 0.3;
+    const globeRadius = 80;
+
     const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Red gradient background
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, "#450a0a");
+      gradient.addColorStop(0.5, "#7f1d1d");
+      gradient.addColorStop(1, "#1f2937");
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw futuristic city skyline
+      buildings.forEach(building => {
+        // Building silhouette
+        ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+        ctx.fillRect(building.x, canvas.height - building.height, building.width, building.height);
+
+        // Building lights
+        building.lights.forEach(light => {
+          light.opacity = Math.sin(Date.now() * 0.001 + light.x * 0.01) * 0.5 + 0.5;
+          ctx.fillStyle = `rgba(255, 255, 100, ${light.opacity})`;
+          ctx.fillRect(light.x, light.y, 3, 3);
+        });
+
+        // Building outline glow
+        ctx.strokeStyle = "rgba(220, 38, 38, 0.3)";
+        ctx.lineWidth = 1;
+        ctx.strokeRect(building.x, canvas.height - building.height, building.width, building.height);
+      });
+
+      // Draw animated globe
+      ctx.save();
+      ctx.translate(globeX, globeY);
+      ctx.rotate(globeRotation);
+
+      // Globe outer circle
+      ctx.beginPath();
+      ctx.arc(0, 0, globeRadius, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(220, 38, 38, 0.1)";
+      ctx.fill();
+      ctx.strokeStyle = "rgba(220, 38, 38, 0.6)";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Globe grid lines
+      ctx.strokeStyle = "rgba(220, 38, 38, 0.4)";
+      ctx.lineWidth = 1;
+      
+      // Vertical lines
+      for (let i = 0; i < 8; i++) {
+        const angle = (i / 8) * Math.PI * 2;
+        ctx.beginPath();
+        ctx.moveTo(Math.cos(angle) * globeRadius, Math.sin(angle) * globeRadius);
+        ctx.lineTo(Math.cos(angle + Math.PI) * globeRadius, Math.sin(angle + Math.PI) * globeRadius);
+        ctx.stroke();
+      }
+
+      // Horizontal lines
+      for (let i = 1; i < 4; i++) {
+        const y = (globeRadius * 2 / 4) * i - globeRadius;
+        const radius = Math.sqrt(globeRadius * globeRadius - y * y);
+        ctx.beginPath();
+        ctx.arc(0, y, radius, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.restore();
+      globeRotation += 0.005;
 
       // Update and draw particles
       particles.forEach((particle, i) => {
@@ -72,18 +172,19 @@ const AnimatedBackground = () => {
           const dy = particle.y - otherParticle.y;
           const distance = Math.sqrt(dx * dx + dy * dy);
 
-          if (distance < 150) {
+          if (distance < 120) {
             ctx.beginPath();
             ctx.moveTo(particle.x, particle.y);
             ctx.lineTo(otherParticle.x, otherParticle.y);
             ctx.strokeStyle = particle.color;
-            ctx.globalAlpha = (150 - distance) / 150 * 0.2;
-            ctx.lineWidth = 0.5;
+            ctx.globalAlpha = (120 - distance) / 120 * 0.3;
+            ctx.lineWidth = 0.8;
             ctx.stroke();
           }
         });
       });
 
+      ctx.globalAlpha = 1;
       requestAnimationFrame(animate);
     };
 
