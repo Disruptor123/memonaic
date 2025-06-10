@@ -59,25 +59,25 @@ const DataSubmission = () => {
 
         {/* Submission Types */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 border-blue-500/30">
+          <Card className="bg-gradient-to-br from-orange-600/20 to-red-600/20 border-orange-500/30">
             <CardContent className="p-6 text-center">
-              <Brain className="h-12 w-12 text-blue-400 mx-auto mb-4" />
+              <Brain className="h-12 w-12 text-orange-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">AI Training Data</h3>
               <p className="text-gray-300 text-sm">Upload datasets for machine learning and AI training</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 border-green-500/30">
+          <Card className="bg-gradient-to-br from-teal-600/20 to-cyan-600/20 border-teal-500/30">
             <CardContent className="p-6 text-center">
-              <FileText className="h-12 w-12 text-green-400 mx-auto mb-4" />
+              <FileText className="h-12 w-12 text-teal-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">Research Papers</h3>
               <p className="text-gray-300 text-sm">Publish scientific research with provenance tracking</p>
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-purple-500/30">
+          <Card className="bg-gradient-to-br from-violet-600/20 to-purple-600/20 border-violet-500/30">
             <CardContent className="p-6 text-center">
-              <Database className="h-12 w-12 text-purple-400 mx-auto mb-4" />
+              <Database className="h-12 w-12 text-violet-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">Memory Structures</h3>
               <p className="text-gray-300 text-sm">Share mnemonics and knowledge graphs</p>
             </CardContent>

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Coins, TrendingUp, Download, Eye, Calendar, ArrowUpRight } from "lucide-react";
+import { Coins, TrendingUp, Download, Eye, Calendar } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 
 const Earnings = () => {
@@ -13,8 +13,7 @@ const Earnings = () => {
   const earningsData = {
     total: "2,485.67",
     monthly: "324.89",
-    weekly: "78.45",
-    pending: "156.23"
+    weekly: "78.45"
   };
 
   const recentEarnings = [
@@ -40,7 +39,7 @@ const Earnings = () => {
       dataset: "NLP Training Data",
       amount: "45.75",
       date: "2024-01-13",
-      status: "pending"
+      status: "completed"
     },
     {
       id: 4,
@@ -87,8 +86,8 @@ const Earnings = () => {
         </div>
 
         {/* Earnings Overview */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 border-green-500/30">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-black/40 to-gray-900/40 border-red-500/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <Coins className="h-5 w-5" />
@@ -101,7 +100,7 @@ const Earnings = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 border-blue-500/30">
+          <Card className="bg-gradient-to-br from-emerald-600/20 to-teal-600/20 border-emerald-500/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
@@ -114,7 +113,7 @@ const Earnings = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-purple-500/30">
+          <Card className="bg-gradient-to-br from-amber-600/20 to-yellow-600/20 border-amber-500/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
@@ -124,19 +123,6 @@ const Earnings = () => {
             <CardContent>
               <div className="text-3xl font-bold text-white">{earningsData.weekly}</div>
               <p className="text-green-400 text-sm">+25% from last week</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-orange-600/20 to-red-600/20 border-orange-500/30">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
-                <ArrowUpRight className="h-5 w-5" />
-                Pending
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-white">{earningsData.pending}</div>
-              <p className="text-yellow-400 text-sm">Processing</p>
             </CardContent>
           </Card>
         </div>
@@ -155,11 +141,8 @@ const Earnings = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-white font-medium">{earning.type}</span>
                         <Badge 
-                          variant={earning.status === 'completed' ? 'default' : 'secondary'}
-                          className={earning.status === 'completed' 
-                            ? 'bg-green-500/20 text-green-400' 
-                            : 'bg-yellow-500/20 text-yellow-400'
-                          }
+                          variant="default"
+                          className="bg-green-500/20 text-green-400"
                         >
                           {earning.status}
                         </Badge>

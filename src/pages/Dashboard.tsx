@@ -29,7 +29,7 @@ const Dashboard = () => {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-purple-500/30">
+          <Card className="bg-gradient-to-br from-black/40 to-gray-900/40 border-red-500/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <Coins className="h-5 w-5" />
@@ -42,7 +42,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 border-blue-500/30">
+          <Card className="bg-gradient-to-br from-cyan-600/20 to-blue-600/20 border-cyan-500/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <Upload className="h-5 w-5" />
@@ -55,7 +55,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 border-green-500/30">
+          <Card className="bg-gradient-to-br from-yellow-600/20 to-amber-600/20 border-yellow-500/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />
@@ -68,7 +68,7 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-orange-600/20 to-red-600/20 border-orange-500/30">
+          <Card className="bg-gradient-to-br from-indigo-600/20 to-purple-600/20 border-indigo-500/30">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <Download className="h-5 w-5" />

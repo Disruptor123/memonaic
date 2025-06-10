@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Brain, Menu, X, Home, Upload, ShoppingCart, Coins, Users, LogOut } from "lucide-react";
+import { Brain, Menu, X, Home, Upload, ShoppingCart, Coins, Users, LogOut, User } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 const DashboardNav = () => {
@@ -14,6 +14,7 @@ const DashboardNav = () => {
     { path: "/marketplace", label: "Marketplace", icon: ShoppingCart },
     { path: "/earnings", label: "Earnings", icon: Coins },
     { path: "/governance", label: "DAO Governance", icon: Users },
+    { path: "/profile", label: "Profile", icon: User },
   ];
 
   return (
