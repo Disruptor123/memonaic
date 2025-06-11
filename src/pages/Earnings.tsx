@@ -87,7 +87,7 @@ const Earnings = () => {
 
         {/* Earnings Overview */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-black/40 to-gray-900/40 border-red-500/30">
+          <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <Coins className="h-5 w-5" />
@@ -100,7 +100,7 @@ const Earnings = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-emerald-600/20 to-teal-600/20 border-emerald-500/30">
+          <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <Calendar className="h-5 w-5" />
@@ -113,7 +113,7 @@ const Earnings = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-amber-600/20 to-yellow-600/20 border-amber-500/30">
+          <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <TrendingUp className="h-5 w-5" />

@@ -114,7 +114,7 @@ const Governance = () => {
 
         {/* User Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-purple-500/30">
+          <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <Vote className="h-5 w-5" />
@@ -127,7 +127,7 @@ const Governance = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 border-blue-500/30">
+          <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <Users className="h-5 w-5" />
@@ -140,7 +140,7 @@ const Governance = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 border-green-500/30">
+          <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
                 <CheckCircle className="h-5 w-5" />
