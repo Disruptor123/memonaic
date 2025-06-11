@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarContent, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { User, Mail, MapPin, Calendar, Edit3, Camera, Award, TrendingUp } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useToast } from "@/hooks/use-toast";
