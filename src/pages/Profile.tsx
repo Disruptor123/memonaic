@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { User, Mail, MapPin, Calendar, Edit3, Camera, Award, TrendingUp } from "lucide-react";
+import { User, Mail, MapPin, Calendar, Edit3, Camera, Award, TrendingUp, Wallet } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useToast } from "@/hooks/use-toast";
 
@@ -25,7 +25,6 @@ const Profile = () => {
 
   const stats = {
     totalContributions: 47,
-    verificationScore: 96,
     citationCount: 234,
     reputation: "Expert"
   };
@@ -42,6 +41,13 @@ const Profile = () => {
     toast({
       title: "Profile Updated",
       description: "Your profile has been successfully updated.",
+    });
+  };
+
+  const handleConnectWallet = () => {
+    toast({
+      title: "Connect Wallet",
+      description: "Wallet connection feature to be configured.",
     });
   };
 
@@ -153,6 +159,19 @@ const Profile = () => {
               </CardContent>
             </Card>
 
+            {/* Connect Wallet Button */}
+            <Card className="bg-black/20 border-red-500/30 mb-6">
+              <CardContent className="p-6">
+                <Button 
+                  onClick={handleConnectWallet}
+                  className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold py-3 px-6 rounded-lg"
+                >
+                  <Wallet className="h-5 w-5 mr-2" />
+                  Connect Wallet
+                </Button>
+              </CardContent>
+            </Card>
+
             {/* Recent Activity */}
             <Card className="bg-black/20 border-red-500/30">
               <CardHeader>
@@ -176,22 +195,7 @@ const Profile = () => {
 
           {/* Stats Sidebar */}
           <div className="space-y-6">
-            <Card className="bg-gradient-to-br from-purple-600/20 to-pink-600/20 border-purple-500/30">
-              <CardHeader>
-                <CardTitle className="text-white flex items-center gap-2">
-                  <Award className="h-5 w-5" />
-                  Reputation Score
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-white mb-2">{stats.verificationScore}%</div>
-                  <p className="text-purple-400">Verification Score</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-gradient-to-br from-blue-600/20 to-cyan-600/20 border-blue-500/30">
+            <Card className="bg-gradient-to-br from-red-800/20 to-red-900/20 border-red-500/30">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
@@ -202,17 +206,17 @@ const Profile = () => {
                 <div className="space-y-3">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white">{stats.totalContributions}</div>
-                    <p className="text-blue-400 text-sm">Total Contributions</p>
+                    <p className="text-red-400 text-sm">Total Contributions</p>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white">{stats.citationCount}</div>
-                    <p className="text-blue-400 text-sm">Citations</p>
+                    <p className="text-red-400 text-sm">Citations</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-green-600/20 to-emerald-600/20 border-green-500/30">
+            <Card className="bg-gradient-to-br from-red-800/20 to-red-900/20 border-red-500/30">
               <CardHeader>
                 <CardTitle className="text-white">Achievements</CardTitle>
               </CardHeader>

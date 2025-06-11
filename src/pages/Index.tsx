@@ -10,6 +10,12 @@ import AnimatedText from "@/components/AnimatedText";
 import FeatureCard from "@/components/FeatureCard";
 import TokenomicsSection from "@/components/TokenomicsSection";
 
+// DEVELOPER CONFIGURATION: Main app navigation routes
+const APP_ROUTES = {
+  DASHBOARD: "/dashboard",
+  LAUNCH_APP: "/dashboard" // Configure this to change where "Launch App" redirects
+};
+
 const Index = () => {
   const [isVisible, setIsVisible] = useState(false);
 
@@ -94,7 +100,7 @@ const Index = () => {
               Built on Avalanche, Memonaic stores encrypted memories, knowledge graphs, and semantic data on-chain while powering the next generation of AI training and scientific research.
             </p>
             <div className={`flex flex-col sm:flex-row gap-4 justify-center transform transition-all duration-1000 delay-500 ${isVisible ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'}`}>
-              <Link to="/dashboard">
+              <Link to={APP_ROUTES.LAUNCH_APP}>
                 <Button size="lg" className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25">
                   Launch App
                   <ArrowRight className="ml-2 h-5 w-5" />
@@ -214,7 +220,7 @@ const Index = () => {
           <p className="text-xl text-gray-300 mb-8">
             Join the Memonaic ecosystem and start earning tokens by contributing valuable data to the on-chain knowledge base.
           </p>
-          <Link to="/dashboard">
+          <Link to={APP_ROUTES.LAUNCH_APP}>
             <Button size="lg" className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25">
               Launch App
               <ArrowRight className="ml-2 h-5 w-5" />
