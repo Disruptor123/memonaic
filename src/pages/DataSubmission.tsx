@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, FileText, Brain, Database, Zap } from "lucide-react";
+import { Upload, FileText, Brain, Database } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useToast } from "@/hooks/use-toast";
 
@@ -194,30 +193,6 @@ const DataSubmission = () => {
                 </Button>
               </div>
             </form>
-          </CardContent>
-        </Card>
-
-        {/* Reward Information */}
-        <Card className="bg-gradient-to-br from-orange-600/20 to-red-600/20 border-orange-500/30 mt-8">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Zap className="h-6 w-6 text-orange-400" />
-              <h3 className="text-xl font-semibold text-white">Earning Potential</h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-              <div>
-                <div className="text-2xl font-bold text-orange-400">50-500</div>
-                <p className="text-gray-300">MEMO tokens per dataset</p>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-orange-400">10%</div>
-                <p className="text-gray-300">Royalties on usage</p>
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-orange-400">2x</div>
-                <p className="text-gray-300">Bonus for verified data</p>
-              </div>
-            </div>
           </CardContent>
         </Card>
       </div>
