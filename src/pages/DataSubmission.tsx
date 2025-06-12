@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -5,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, FileText, Brain, Database, CheckCircle, Clock, Loader2 } from "lucide-react";
+import { Upload, FileText, Brain, Database, CheckCircle, Clock, Loader2, Coins } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -25,7 +26,8 @@ const DataSubmission = () => {
     category: "",
     tags: "",
     license: "",
-    file: null as File | null
+    file: null as File | null,
+    price: ""
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -46,7 +48,7 @@ const DataSubmission = () => {
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        price: "150 MEMO",
+        price: formData.price ? `${formData.price} MEMO` : "150 MEMO",
         rating: 0,
         downloads: 0,
         author: "You",
@@ -185,7 +187,7 @@ const DataSubmission = () => {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <Label htmlFor="tags" className="text-white">Tags</Label>
                   <Input
@@ -210,6 +212,26 @@ const DataSubmission = () => {
                       <SelectItem value="custom">Custom License</SelectItem>
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div>
+                  <Label htmlFor="price" className="text-white">Price (Optional)</Label>
+                  <div className="relative">
+                    <Input
+                      id="price"
+                      type="number"
+                      value={formData.price}
+                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                      className="bg-black/30 border-gray-600 text-white pr-16"
+                      placeholder="150"
+                      min="0"
+                    />
+                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
+                      <Coins className="h-4 w-4 text-gray-400" />
+                      <span className="text-gray-400 text-sm">MEMO</span>
+                    </div>
+                  </div>
+                  <p className="text-gray-400 text-sm mt-1">Leave empty for default pricing (150 MEMO)</p>
                 </div>
               </div>
 

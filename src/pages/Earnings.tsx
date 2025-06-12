@@ -1,14 +1,19 @@
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Coins, TrendingUp, Download, Eye, Calendar } from "lucide-react";
+import { Coins, TrendingUp, Download, Eye, Calendar, CheckCircle, Loader2 } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
+import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Earnings = () => {
+  const { toast } = useToast();
   const [timeframe, setTimeframe] = useState("month");
+  const [isWithdrawing, setIsWithdrawing] = useState(false);
+  const [withdrawComplete, setWithdrawComplete] = useState(false);
+  const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [earningsData, setEarningsData] = useState({
     total: "2485.67",
     monthly: "324.89",
@@ -27,6 +32,36 @@ const Earnings = () => {
       }));
     }
   }, []);
+
+  const handleWithdraw = async () => {
+    setIsWithdrawing(true);
+    setShowWithdrawDialog(true);
+    
+    // Simulate withdrawal process (30 seconds)
+    setTimeout(() => {
+      setIsWithdrawing(false);
+      setWithdrawComplete(true);
+      
+      // Clear earnings after withdrawal
+      localStorage.setItem('totalEarnings', '0');
+      setEarningsData(prev => ({ 
+        ...prev, 
+        total: "0",
+        monthly: "0",
+        weekly: "0"
+      }));
+      
+      toast({
+        title: "Withdrawal Successful!",
+        description: "Your MEMO tokens have been transferred to your wallet.",
+      });
+    }, 30000); // 30 seconds
+  };
+
+  const closeDialog = () => {
+    setShowWithdrawDialog(false);
+    setWithdrawComplete(false);
+  };
 
   const recentEarnings = [
     {
@@ -218,12 +253,82 @@ const Earnings = () => {
                 <div className="text-2xl font-bold text-white">{earningsData.total} MEMO</div>
                 <p className="text-gray-400 text-sm">≈ ${(parseFloat(earningsData.total) * 2).toFixed(2)} USD</p>
               </div>
-              <Button className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700">
-                Withdraw Tokens
+              <Button 
+                onClick={handleWithdraw}
+                disabled={parseFloat(earningsData.total) === 0}
+                className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+              >
+                {parseFloat(earningsData.total) === 0 ? "No Tokens to Withdraw" : "Withdraw Tokens"}
               </Button>
             </div>
           </CardContent>
         </Card>
+
+        {/* Withdrawal Dialog */}
+        <Dialog open={showWithdrawDialog} onOpenChange={setShowWithdrawDialog}>
+          <DialogContent className="bg-black/90 border-red-500/30 text-white max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                {isWithdrawing ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Processing Withdrawal
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-5 w-5 text-green-400" />
+                    Withdrawal Complete
+                  </>
+                )}
+              </DialogTitle>
+            </DialogHeader>
+            
+            {isWithdrawing ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-yellow-400">
+                  <Coins className="h-4 w-4" />
+                  <span>Processing withdrawal...</span>
+                </div>
+                <p className="text-gray-300 text-sm">
+                  Your withdrawal is being processed on the blockchain. This usually takes about 30 seconds.
+                </p>
+                <div className="bg-black/30 p-4 rounded-lg">
+                  <p className="text-xs text-gray-400">Transaction Hash:</p>
+                  <p className="text-xs font-mono text-green-400">0x{Math.random().toString(16).substr(2, 40)}</p>
+                </div>
+              </div>
+            ) : withdrawComplete ? (
+              <div className="space-y-4">
+                <div className="text-center">
+                  <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-green-400 mb-2">Withdrawal Successful!</h3>
+                </div>
+                
+                <div className="bg-black/30 p-4 rounded-lg space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-400">Amount Withdrawn:</p>
+                    <p className="text-lg font-bold text-green-400">{earningsData.total} MEMO</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400">Transaction Hash:</p>
+                    <p className="text-xs font-mono text-green-400">0x{Math.random().toString(16).substr(2, 40)}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400">Status:</p>
+                    <Badge className="bg-green-500/20 text-green-400">Confirmed</Badge>
+                  </div>
+                </div>
+                
+                <Button 
+                  onClick={closeDialog}
+                  className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+                >
+                  Close
+                </Button>
+              </div>
+            ) : null}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
