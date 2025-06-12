@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -195,7 +194,7 @@ const Profile = () => {
 
           {/* Stats Sidebar */}
           <div className="space-y-6">
-            <Card className="bg-gradient-to-br from-red-800/20 to-red-900/20 border-red-500/30">
+            <Card className="bg-gray-900/80 border-red-500/30">
               <CardHeader>
                 <CardTitle className="text-white flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
@@ -216,7 +215,7 @@ const Profile = () => {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-red-800/20 to-red-900/20 border-red-500/30">
+            <Card className="bg-gray-900/80 border-red-500/30">
               <CardHeader>
                 <CardTitle className="text-white">Achievements</CardTitle>
               </CardHeader>
