@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -8,13 +8,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Search, Download, Star, Eye, Filter, Brain, FileText, Database } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Marketplace = () => {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [selectedDataset, setSelectedDataset] = useState<any>(null);
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [userBalance, setUserBalance] = useState(5000); // Default MEMO balance
 
-  const datasets = [
+  const defaultDatasets = [
     {
       id: 1,
       title: "Large Language Model Training Dataset",
@@ -25,7 +29,8 @@ const Marketplace = () => {
       downloads: 1247,
       author: "AI Research Lab",
       tags: ["NLP", "LLM", "Training"],
-      icon: Brain
+      icon: Brain,
+      downloadUrl: "#"
     },
     {
       id: 2,
@@ -37,7 +42,8 @@ const Marketplace = () => {
       downloads: 892,
       author: "Climate Institute",
       tags: ["Climate", "Research", "Papers"],
-      icon: FileText
+      icon: FileText,
+      downloadUrl: "#"
     },
     {
       id: 3,
@@ -49,7 +55,8 @@ const Marketplace = () => {
       downloads: 634,
       author: "Medical AI Group",
       tags: ["Medical", "Computer Vision", "Classification"],
-      icon: Brain
+      icon: Brain,
+      downloadUrl: "#"
     },
     {
       id: 4,
@@ -61,15 +68,87 @@ const Marketplace = () => {
       downloads: 423,
       author: "Knowledge Systems",
       tags: ["Knowledge Graph", "Science", "Concepts"],
-      icon: Database
+      icon: Database,
+      downloadUrl: "#"
     }
   ];
 
+  const [datasets, setDatasets] = useState(defaultDatasets);
+  const [purchasedDatasets, setPurchasedDatasets] = useState<number[]>([]);
+
+  useEffect(() => {
+    // Load user uploaded datasets
+    const userDatasets = JSON.parse(localStorage.getItem('userDatasets') || '[]');
+    if (userDatasets.length > 0) {
+      setDatasets([...defaultDatasets, ...userDatasets]);
+    }
+
+    // Load purchased datasets
+    const purchased = JSON.parse(localStorage.getItem('purchasedDatasets') || '[]');
+    setPurchasedDatasets(purchased);
+  }, []);
+
   const handlePurchase = (dataset: any) => {
-    toast({
-      title: "Dataset Purchased!",
-      description: `${dataset.title} has been added to your collection.`,
-    });
+    const price = parseInt(dataset.price.replace(' MEMO', ''));
+    
+    if (userBalance >= price) {
+      // Update balance
+      setUserBalance(prev => prev - price);
+      
+      // Add to purchased datasets
+      const newPurchased = [...purchasedDatasets, dataset.id];
+      setPurchasedDatasets(newPurchased);
+      localStorage.setItem('purchasedDatasets', JSON.stringify(newPurchased));
+      
+      // Simulate download
+      const blob = new Blob(['Dataset content would be here...'], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${dataset.title}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Dataset Purchased & Downloaded!",
+        description: `${dataset.title} has been purchased and downloaded automatically.`,
+      });
+    } else {
+      toast({
+        title: "Insufficient Balance",
+        description: "You don't have enough MEMO tokens to purchase this dataset.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  const handleDownload = (dataset: any) => {
+    if (purchasedDatasets.includes(dataset.id)) {
+      // Simulate download
+      const blob = new Blob(['Dataset content would be here...'], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${dataset.title}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Download Started",
+        description: `Downloading ${dataset.title}...`,
+      });
+    } else {
+      handlePurchase(dataset);
+    }
+  };
+
+  const handlePreview = (dataset: any) => {
+    setSelectedDataset(dataset);
+    setShowPreviewDialog(true);
   };
 
   const filteredDatasets = datasets.filter(dataset => {
@@ -86,10 +165,18 @@ const Marketplace = () => {
       <div className="container mx-auto px-6 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent mb-2">
-            Data Marketplace
-          </h1>
-          <p className="text-gray-300">Discover and purchase verified datasets, research papers, and knowledge structures</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent mb-2">
+                Data Marketplace
+              </h1>
+              <p className="text-gray-300">Discover and purchase verified datasets, research papers, and knowledge structures</p>
+            </div>
+            <div className="text-right">
+              <p className="text-gray-300 text-sm">Your Balance</p>
+              <p className="text-2xl font-bold text-green-400">{userBalance} MEMO</p>
+            </div>
+          </div>
         </div>
 
         {/* Search and Filters */}
@@ -121,7 +208,7 @@ const Marketplace = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card className="bg-black/20 border-red-500/30">
             <CardContent className="p-4 text-center">
-              <div className="text-2xl font-bold text-red-400">2,847</div>
+              <div className="text-2xl font-bold text-red-400">{datasets.length}</div>
               <p className="text-gray-300 text-sm">Total Datasets</p>
             </CardContent>
           </Card>
@@ -149,6 +236,7 @@ const Marketplace = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDatasets.map((dataset) => {
             const Icon = dataset.icon;
+            const isPurchased = purchasedDatasets.includes(dataset.id);
             return (
               <Card key={dataset.id} className="bg-black/20 border-red-500/30 hover:bg-black/30 transition-all duration-300">
                 <CardHeader className="pb-3">
@@ -158,6 +246,9 @@ const Marketplace = () => {
                       <Badge variant="secondary" className="bg-red-500/20 text-red-300">
                         {dataset.category}
                       </Badge>
+                      {isPurchased && (
+                        <Badge className="bg-green-500/20 text-green-400">Owned</Badge>
+                      )}
                     </div>
                     <div className="flex items-center gap-1 text-yellow-400">
                       <Star className="h-4 w-4 fill-current" />
@@ -188,15 +279,20 @@ const Marketplace = () => {
                   <div className="flex items-center justify-between">
                     <div className="text-lg font-bold text-red-400">{dataset.price}</div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="border-gray-600 text-gray-300">
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        className="border-gray-600 text-gray-300"
+                        onClick={() => handlePreview(dataset)}
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
                       <Button 
                         size="sm" 
                         className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
-                        onClick={() => handlePurchase(dataset)}
+                        onClick={() => handleDownload(dataset)}
                       >
-                        Purchase
+                        {isPurchased ? 'Download' : 'Purchase'}
                       </Button>
                     </div>
                   </div>
@@ -205,6 +301,87 @@ const Marketplace = () => {
             );
           })}
         </div>
+
+        {/* Preview Dialog */}
+        <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
+          <DialogContent className="bg-black/90 border-red-500/30 text-white max-w-2xl">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                Dataset Preview
+              </DialogTitle>
+            </DialogHeader>
+            
+            {selectedDataset && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-2">{selectedDataset.title}</h3>
+                  <Badge className="bg-red-500/20 text-red-300">{selectedDataset.category}</Badge>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-300 mb-1">Description:</h4>
+                  <p className="text-gray-300">{selectedDataset.description}</p>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-300 mb-1">Author:</h4>
+                    <p className="text-white">{selectedDataset.author}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-300 mb-1">Price:</h4>
+                    <p className="text-red-400 font-bold">{selectedDataset.price}</p>
+                  </div>
+                </div>
+                
+                <div>
+                  <h4 className="text-sm font-semibold text-gray-300 mb-1">Tags:</h4>
+                  <div className="flex flex-wrap gap-1">
+                    {selectedDataset.tags.map((tag, index) => (
+                      <Badge key={index} variant="outline" className="text-xs border-gray-600 text-gray-300">
+                        {tag}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-black/30 p-4 rounded-lg">
+                  <h4 className="text-sm font-semibold text-gray-300 mb-2">Sample Data Preview:</h4>
+                  <pre className="text-xs text-gray-400">
+{`{
+  "sample_data": {
+    "records": 50000,
+    "features": ["text", "label", "metadata"],
+    "format": "JSON/CSV",
+    "size": "250MB"
+  }
+}`}
+                  </pre>
+                </div>
+                
+                <div className="flex gap-2 pt-4">
+                  <Button 
+                    className="flex-1 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+                    onClick={() => {
+                      handleDownload(selectedDataset);
+                      setShowPreviewDialog(false);
+                    }}
+                  >
+                    {purchasedDatasets.includes(selectedDataset.id) ? 'Download Now' : 'Purchase & Download'}
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="border-red-500 text-red-300 hover:bg-red-500/10"
+                    onClick={() => setShowPreviewDialog(false)}
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

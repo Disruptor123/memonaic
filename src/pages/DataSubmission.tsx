@@ -5,12 +5,20 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, FileText, Brain, Database } from "lucide-react";
+import { Upload, FileText, Brain, Database, CheckCircle, Clock, Loader2 } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
 
 const DataSubmission = () => {
   const { toast } = useToast();
+  const navigate = useNavigate();
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [verificationComplete, setVerificationComplete] = useState(false);
+  const [showVerificationDialog, setShowVerificationDialog] = useState(false);
+  const [submittedDataset, setSubmittedDataset] = useState<any>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -20,12 +28,60 @@ const DataSubmission = () => {
     file: null as File | null
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Dataset Submitted Successfully!",
-      description: "Your dataset is being processed and will be available in the marketplace soon.",
-    });
+    
+    // Start verification process
+    setIsVerifying(true);
+    setShowVerificationDialog(true);
+    
+    // Simulate smart contract verification (1 minute)
+    setTimeout(() => {
+      setIsVerifying(false);
+      setVerificationComplete(true);
+      
+      // Create dataset object
+      const newDataset = {
+        id: Date.now(),
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        price: "150 MEMO",
+        rating: 0,
+        downloads: 0,
+        author: "You",
+        tags: formData.tags.split(",").map(tag => tag.trim()),
+        icon: formData.category.includes("AI") ? Brain : formData.category.includes("Research") ? FileText : Database,
+        verificationHash: `0x${Math.random().toString(16).substr(2, 40)}`,
+        timestamp: new Date().toISOString()
+      };
+      
+      setSubmittedDataset(newDataset);
+      
+      // Update localStorage for marketplace and earnings
+      const existingDatasets = JSON.parse(localStorage.getItem('userDatasets') || '[]');
+      const existingEarnings = parseFloat(localStorage.getItem('totalEarnings') || '2485.67');
+      
+      localStorage.setItem('userDatasets', JSON.stringify([...existingDatasets, newDataset]));
+      localStorage.setItem('totalEarnings', (existingEarnings + 1560).toString());
+      
+      toast({
+        title: "Dataset Verified and Listed!",
+        description: "Your dataset has been verified and added to the marketplace. You've earned 1,560 MEMO tokens!",
+      });
+    }, 60000); // 1 minute verification
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setFormData({ ...formData, file: e.target.files[0] });
+    }
+  };
+
+  const closeDialog = () => {
+    setShowVerificationDialog(false);
+    setVerificationComplete(false);
+    setSubmittedDataset(null);
     // Reset form
     setFormData({
       title: "",
@@ -35,12 +91,6 @@ const DataSubmission = () => {
       license: "",
       file: null
     });
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData({ ...formData, file: e.target.files[0] });
-    }
   };
 
   return (
@@ -195,6 +245,85 @@ const DataSubmission = () => {
             </form>
           </CardContent>
         </Card>
+
+        {/* Verification Dialog */}
+        <Dialog open={showVerificationDialog} onOpenChange={setShowVerificationDialog}>
+          <DialogContent className="bg-black/90 border-red-500/30 text-white max-w-md">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2">
+                {isVerifying ? (
+                  <>
+                    <Loader2 className="h-5 w-5 animate-spin" />
+                    Smart Contract Verification
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="h-5 w-5 text-green-400" />
+                    Verification Complete
+                  </>
+                )}
+              </DialogTitle>
+            </DialogHeader>
+            
+            {isVerifying ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-yellow-400">
+                  <Clock className="h-4 w-4" />
+                  <span>Verifying dataset integrity...</span>
+                </div>
+                <p className="text-gray-300 text-sm">
+                  Your dataset is being verified on the blockchain. This process takes approximately 1 minute to ensure data integrity and authenticity.
+                </p>
+                <div className="bg-black/30 p-4 rounded-lg">
+                  <p className="text-xs text-gray-400">Transaction Hash:</p>
+                  <p className="text-xs font-mono text-green-400">0x{Math.random().toString(16).substr(2, 40)}</p>
+                </div>
+              </div>
+            ) : verificationComplete && submittedDataset ? (
+              <div className="space-y-4">
+                <div className="text-center">
+                  <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-green-400 mb-2">Dataset Verified Successfully!</h3>
+                </div>
+                
+                <div className="bg-black/30 p-4 rounded-lg space-y-3">
+                  <div>
+                    <p className="text-sm text-gray-400">Dataset Title:</p>
+                    <p className="text-white font-medium">{submittedDataset.title}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400">Verification Hash:</p>
+                    <p className="text-xs font-mono text-green-400">{submittedDataset.verificationHash}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400">Reward Earned:</p>
+                    <p className="text-lg font-bold text-green-400">+1,560 MEMO</p>
+                  </div>
+                  <div>
+                    <p className="text-sm text-gray-400">Status:</p>
+                    <Badge className="bg-green-500/20 text-green-400">Listed on Marketplace</Badge>
+                  </div>
+                </div>
+                
+                <div className="flex gap-2">
+                  <Button 
+                    onClick={() => navigate('/marketplace')}
+                    className="flex-1 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+                  >
+                    View in Marketplace
+                  </Button>
+                  <Button 
+                    onClick={closeDialog}
+                    variant="outline" 
+                    className="flex-1 border-red-500 text-red-300 hover:bg-red-500/10"
+                  >
+                    Close
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -8,16 +9,36 @@ import DashboardNav from "@/components/DashboardNav";
 
 const Earnings = () => {
   const [timeframe, setTimeframe] = useState("month");
-
-  const earningsData = {
-    total: "2,485.67",
+  const [earningsData, setEarningsData] = useState({
+    total: "2485.67",
     monthly: "324.89",
     weekly: "78.45"
-  };
+  });
+
+  useEffect(() => {
+    // Update earnings from localStorage
+    const totalEarnings = localStorage.getItem('totalEarnings');
+    if (totalEarnings) {
+      setEarningsData(prev => ({ 
+        ...prev, 
+        total: totalEarnings,
+        monthly: (parseFloat(totalEarnings) * 0.13).toFixed(2),
+        weekly: (parseFloat(totalEarnings) * 0.032).toFixed(2)
+      }));
+    }
+  }, []);
 
   const recentEarnings = [
     {
       id: 1,
+      type: "Dataset Upload Reward",
+      dataset: "AI Training Dataset",
+      amount: "1560.00",
+      date: new Date().toISOString().split('T')[0],
+      status: "completed"
+    },
+    {
+      id: 2,
       type: "Dataset Download",
       dataset: "Climate Research Data",
       amount: "25.50",
@@ -25,7 +46,7 @@ const Earnings = () => {
       status: "completed"
     },
     {
-      id: 2,
+      id: 3,
       type: "Verification Reward",
       dataset: "Medical Images Dataset",
       amount: "15.00",
@@ -33,19 +54,11 @@ const Earnings = () => {
       status: "completed"
     },
     {
-      id: 3,
+      id: 4,
       type: "Royalty Payment",
       dataset: "NLP Training Data",
       amount: "45.75",
       date: "2024-01-13",
-      status: "completed"
-    },
-    {
-      id: 4,
-      type: "Paper Citation",
-      dataset: "AI Ethics Research",
-      amount: "8.25",
-      date: "2024-01-12",
       status: "completed"
     }
   ];
@@ -53,9 +66,9 @@ const Earnings = () => {
   const topDatasets = [
     {
       name: "Large Language Model Dataset",
-      earnings: "456.89",
-      downloads: 89,
-      growth: "+12%"
+      earnings: "1560.00",
+      downloads: 1,
+      growth: "+100%"
     },
     {
       name: "Computer Vision Training Data",
@@ -180,7 +193,7 @@ const Earnings = () => {
                       <span className="text-green-400 font-bold">{dataset.earnings} MEMO</span>
                     </div>
                     <Progress 
-                      value={(parseFloat(dataset.earnings) / 500) * 100} 
+                      value={(parseFloat(dataset.earnings) / 2000) * 100} 
                       className="h-2 bg-gray-700"
                     />
                   </div>
@@ -203,7 +216,7 @@ const Earnings = () => {
               <div>
                 <p className="text-gray-300 mb-2">Available for withdrawal</p>
                 <div className="text-2xl font-bold text-white">{earningsData.total} MEMO</div>
-                <p className="text-gray-400 text-sm">≈ $4,971.34 USD</p>
+                <p className="text-gray-400 text-sm">≈ ${(parseFloat(earningsData.total) * 2).toFixed(2)} USD</p>
               </div>
               <Button className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700">
                 Withdraw Tokens

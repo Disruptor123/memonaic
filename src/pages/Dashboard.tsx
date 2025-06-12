@@ -1,17 +1,27 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Brain, Database, FileText, Coins, Users, Upload, Download } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
+import { useNavigate } from "react-router-dom";
 
 const Dashboard = () => {
-  const [stats] = useState({
+  const navigate = useNavigate();
+  const [stats, setStats] = useState({
     totalEarnings: "2,485.67",
     datasetsUploaded: 23,
     totalDownloads: 1247
   });
+
+  useEffect(() => {
+    // Update earnings from localStorage
+    const totalEarnings = localStorage.getItem('totalEarnings');
+    if (totalEarnings) {
+      setStats(prev => ({ ...prev, totalEarnings }));
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900">
@@ -70,7 +80,10 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="bg-black/20 border-red-500/30 hover:bg-black/30 transition-all duration-300 cursor-pointer">
+          <Card 
+            className="bg-black/20 border-red-500/30 hover:bg-black/30 transition-all duration-300 cursor-pointer"
+            onClick={() => navigate('/data-submission')}
+          >
             <CardContent className="p-6 text-center">
               <Brain className="h-12 w-12 text-red-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">Upload Dataset</h3>
@@ -78,7 +91,10 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-black/20 border-red-500/30 hover:bg-black/30 transition-all duration-300 cursor-pointer">
+          <Card 
+            className="bg-black/20 border-red-500/30 hover:bg-black/30 transition-all duration-300 cursor-pointer"
+            onClick={() => navigate('/marketplace')}
+          >
             <CardContent className="p-6 text-center">
               <Database className="h-12 w-12 text-blue-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">Browse Marketplace</h3>
@@ -86,7 +102,10 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-black/20 border-red-500/30 hover:bg-black/30 transition-all duration-300 cursor-pointer">
+          <Card 
+            className="bg-black/20 border-red-500/30 hover:bg-black/30 transition-all duration-300 cursor-pointer"
+            onClick={() => navigate('/data-submission')}
+          >
             <CardContent className="p-6 text-center">
               <FileText className="h-12 w-12 text-green-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">Publish Research</h3>
@@ -94,7 +113,10 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card className="bg-black/20 border-red-500/30 hover:bg-black/30 transition-all duration-300 cursor-pointer">
+          <Card 
+            className="bg-black/20 border-red-500/30 hover:bg-black/30 transition-all duration-300 cursor-pointer"
+            onClick={() => navigate('/governance')}
+          >
             <CardContent className="p-6 text-center">
               <Users className="h-12 w-12 text-purple-400 mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">DAO Governance</h3>
