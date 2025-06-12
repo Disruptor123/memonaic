@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,18 @@ import { useToast } from "@/hooks/use-toast";
 const Governance = () => {
   const { toast } = useToast();
   const [selectedProposal, setSelectedProposal] = useState<number | null>(null);
+  const [userVotes, setUserVotes] = useState<{ [key: number]: 'for' | 'against' | null }>({});
+  
+  // Calculate live reputation based on user activities
+  const calculateReputation = () => {
+    const datasetsUploaded = parseInt(localStorage.getItem('datasetsUploaded') || '0');
+    const totalEarnings = parseFloat(localStorage.getItem('totalEarnings') || '0');
+    
+    // Base reputation calculation: datasets * 10 + earnings * 0.1
+    return Math.floor(datasetsUploaded * 10 + totalEarnings * 0.1);
+  };
+
+  const userReputation = calculateReputation();
 
   const proposals = [
     {
@@ -71,7 +82,7 @@ const Governance = () => {
   const userStats = {
     votingPower: "1,250",
     proposalsVoted: 15,
-    reputation: 94
+    reputation: userReputation
   };
 
   const handleVote = (proposalId: number, vote: 'for' | 'against') => {
@@ -79,6 +90,10 @@ const Governance = () => {
       title: "Vote Submitted!",
       description: `Your vote ${vote === 'for' ? 'in favor' : 'against'} the proposal has been recorded.`,
     });
+    setUserVotes((prevVotes) => ({
+      ...prevVotes,
+      [proposalId]: vote
+    }));
   };
 
   const getStatusColor = (status: string) => {
@@ -109,11 +124,24 @@ const Governance = () => {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent mb-2">
             DAO Governance
           </h1>
-          <p className="text-gray-300">Participate in Memonaic's decentralized governance and shape the future of the platform</p>
+          <p className="text-gray-300">Participate in Memonaic's decentralized decision making</p>
         </div>
 
         {/* User Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <Card className="bg-gradient-to-br from-purple-800/60 to-purple-900/60 border-purple-600/50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Reputation Score
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-white">{userReputation}</div>
+              <p className="text-gray-400 text-sm">Based on your contributions</p>
+            </CardContent>
+          </Card>
+
           <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
@@ -130,26 +158,13 @@ const Governance = () => {
           <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
-                <Users className="h-5 w-5" />
+                <CheckCircle className="h-5 w-5" />
                 Proposals Voted
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-white">{userStats.proposalsVoted}</div>
               <p className="text-blue-400 text-sm">This quarter</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
-                <CheckCircle className="h-5 w-5" />
-                Reputation Score
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-white">{userStats.reputation}%</div>
-              <p className="text-green-400 text-sm">Excellent standing</p>
             </CardContent>
           </Card>
         </div>

@@ -6,20 +6,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Upload, FileText, Brain, Database, CheckCircle, Clock, Loader2, Coins } from "lucide-react";
+import { Upload, FileText, CheckCircle, Loader2 } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useToast } from "@/hooks/use-toast";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Badge } from "@/components/ui/badge";
-import { useNavigate } from "react-router-dom";
 
 const DataSubmission = () => {
   const { toast } = useToast();
-  const navigate = useNavigate();
-  const [isVerifying, setIsVerifying] = useState(false);
-  const [verificationComplete, setVerificationComplete] = useState(false);
-  const [showVerificationDialog, setShowVerificationDialog] = useState(false);
-  const [submittedDataset, setSubmittedDataset] = useState<any>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -29,70 +22,89 @@ const DataSubmission = () => {
     file: null as File | null,
     price: ""
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [verificationComplete, setVerificationComplete] = useState(false);
+  const [showVerificationDialog, setShowVerificationDialog] = useState(false);
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setFormData(prev => ({ ...prev, file }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Start verification process
-    setIsVerifying(true);
+    if (!formData.file) {
+      toast({
+        title: "Error",
+        description: "Please select a file to upload.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsSubmitting(true);
     setShowVerificationDialog(true);
     
-    // Simulate smart contract verification (1 minute)
+    // Simulate 1-minute verification process
     setTimeout(() => {
-      setIsVerifying(false);
+      setIsSubmitting(false);
       setVerificationComplete(true);
       
-      // Create dataset object
+      // Add to marketplace
+      const existingDatasets = JSON.parse(localStorage.getItem('userDatasets') || '[]');
       const newDataset = {
         id: Date.now(),
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        price: formData.price ? `${formData.price} MEMO` : "150 MEMO",
-        rating: 0,
+        tags: formData.tags.split(',').map(tag => tag.trim()),
+        license: formData.license,
+        fileName: formData.file?.name,
+        fileSize: formData.file?.size,
+        price: formData.price || "Free",
+        uploadDate: new Date().toISOString(),
         downloads: 0,
-        author: "You",
-        tags: formData.tags.split(",").map(tag => tag.trim()),
-        icon: formData.category.includes("AI") ? Brain : formData.category.includes("Research") ? FileText : Database,
-        verificationHash: `0x${Math.random().toString(16).substr(2, 40)}`,
-        timestamp: new Date().toISOString()
+        uploader: "You"
       };
       
-      setSubmittedDataset(newDataset);
+      existingDatasets.push(newDataset);
+      localStorage.setItem('userDatasets', JSON.stringify(existingDatasets));
       
-      // Update localStorage for marketplace and earnings
-      const existingDatasets = JSON.parse(localStorage.getItem('userDatasets') || '[]');
-      const existingEarnings = parseFloat(localStorage.getItem('totalEarnings') || '2485.67');
+      // Update earnings
+      const currentEarnings = parseFloat(localStorage.getItem('totalEarnings') || '0');
+      const newEarnings = currentEarnings + 1560;
+      localStorage.setItem('totalEarnings', newEarnings.toString());
       
-      localStorage.setItem('userDatasets', JSON.stringify([...existingDatasets, newDataset]));
-      localStorage.setItem('totalEarnings', (existingEarnings + 1560).toString());
+      // Update datasets uploaded count
+      const currentDatasets = parseInt(localStorage.getItem('datasetsUploaded') || '0');
+      localStorage.setItem('datasetsUploaded', (currentDatasets + 1).toString());
       
       toast({
-        title: "Dataset Verified and Listed!",
-        description: "Your dataset has been verified and added to the marketplace. You've earned 1,560 MEMO tokens!",
+        title: "Dataset Verified Successfully!",
+        description: "Your dataset has been added to the marketplace and you've earned 1,560 MEMO tokens!",
       });
-    }, 60000); // 1 minute verification
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData({ ...formData, file: e.target.files[0] });
-    }
+      
+      // Reset form
+      setFormData({
+        title: "",
+        description: "",
+        category: "",
+        tags: "",
+        license: "",
+        file: null,
+        price: ""
+      });
+    }, 60000); // 1 minute
   };
 
   const closeDialog = () => {
     setShowVerificationDialog(false);
     setVerificationComplete(false);
-    setSubmittedDataset(null);
-    // Reset form
-    setFormData({
-      title: "",
-      description: "",
-      category: "",
-      tags: "",
-      license: "",
-      file: null
-    });
   };
 
   return (
@@ -100,183 +112,161 @@ const DataSubmission = () => {
       <DashboardNav />
       
       <div className="container mx-auto px-6 py-8">
-        {/* Header */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent mb-2">
             Data Submission
           </h1>
-          <p className="text-gray-300">Contribute to the decentralized knowledge base and earn MEMO tokens</p>
+          <p className="text-gray-300">Upload your datasets and research papers to earn MEMO tokens</p>
         </div>
 
-        {/* Submission Types */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
-            <CardContent className="p-6 text-center">
-              <Brain className="h-12 w-12 text-orange-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">AI Training Data</h3>
-              <p className="text-gray-300 text-sm">Upload datasets for machine learning and AI training</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
-            <CardContent className="p-6 text-center">
-              <FileText className="h-12 w-12 text-teal-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">Research Papers</h3>
-              <p className="text-gray-300 text-sm">Publish scientific research with provenance tracking</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
-            <CardContent className="p-6 text-center">
-              <Database className="h-12 w-12 text-violet-400 mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">Memory Structures</h3>
-              <p className="text-gray-300 text-sm">Share mnemonics and knowledge graphs</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Submission Form */}
-        <Card className="bg-black/20 border-red-500/30">
-          <CardHeader>
-            <CardTitle className="text-white flex items-center gap-2">
-              <Upload className="h-5 w-5" />
-              Submit Your Dataset
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <Label htmlFor="title" className="text-white">Dataset Title *</Label>
+        <div className="max-w-2xl mx-auto">
+          <Card className="bg-black/20 border-red-500/30">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Upload className="h-5 w-5" />
+                Submit Your Dataset
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-gray-300">Title</Label>
                   <Input
                     id="title"
                     value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    className="bg-black/30 border-gray-600 text-white"
+                    onChange={(e) => handleInputChange("title", e.target.value)}
                     placeholder="Enter dataset title"
+                    className="bg-black/20 border-red-500/30 text-white"
                     required
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="category" className="text-white">Category *</Label>
-                  <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
-                    <SelectTrigger className="bg-black/30 border-gray-600 text-white">
+                <div className="space-y-2">
+                  <Label htmlFor="description" className="text-gray-300">Description</Label>
+                  <Textarea
+                    id="description"
+                    value={formData.description}
+                    onChange={(e) => handleInputChange("description", e.target.value)}
+                    placeholder="Describe your dataset"
+                    className="bg-black/20 border-red-500/30 text-white min-h-24"
+                    required
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="category" className="text-gray-300">Category</Label>
+                  <Select onValueChange={(value) => handleInputChange("category", value)} required>
+                    <SelectTrigger className="bg-black/20 border-red-500/30 text-white">
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="ai-training">AI Training Data</SelectItem>
-                      <SelectItem value="research">Research Papers</SelectItem>
-                      <SelectItem value="memory">Memory Structures</SelectItem>
-                      <SelectItem value="models">Model Metadata</SelectItem>
+                      <SelectItem value="research">Research Data</SelectItem>
+                      <SelectItem value="medical">Medical Data</SelectItem>
+                      <SelectItem value="financial">Financial Data</SelectItem>
+                      <SelectItem value="climate">Climate Data</SelectItem>
+                      <SelectItem value="nlp">NLP Data</SelectItem>
+                      <SelectItem value="computer-vision">Computer Vision</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
 
-              <div>
-                <Label htmlFor="description" className="text-white">Description *</Label>
-                <Textarea
-                  id="description"
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="bg-black/30 border-gray-600 text-white"
-                  placeholder="Describe your dataset, its use cases, and methodology..."
-                  rows={4}
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <Label htmlFor="tags" className="text-white">Tags</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="tags" className="text-gray-300">Tags</Label>
                   <Input
                     id="tags"
                     value={formData.tags}
-                    onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-                    className="bg-black/30 border-gray-600 text-white"
-                    placeholder="machine-learning, nlp, computer-vision"
+                    onChange={(e) => handleInputChange("tags", e.target.value)}
+                    placeholder="Enter tags separated by commas"
+                    className="bg-black/20 border-red-500/30 text-white"
                   />
                 </div>
 
-                <div>
-                  <Label htmlFor="license" className="text-white">License</Label>
-                  <Select value={formData.license} onValueChange={(value) => setFormData({ ...formData, license: value })}>
-                    <SelectTrigger className="bg-black/30 border-gray-600 text-white">
+                <div className="space-y-2">
+                  <Label htmlFor="license" className="text-gray-300">License</Label>
+                  <Select onValueChange={(value) => handleInputChange("license", value)} required>
+                    <SelectTrigger className="bg-black/20 border-red-500/30 text-white">
                       <SelectValue placeholder="Select license" />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="mit">MIT License</SelectItem>
                       <SelectItem value="apache">Apache 2.0</SelectItem>
-                      <SelectItem value="cc0">CC0 Public Domain</SelectItem>
-                      <SelectItem value="custom">Custom License</SelectItem>
+                      <SelectItem value="gpl">GPL v3</SelectItem>
+                      <SelectItem value="cc0">CC0 (Public Domain)</SelectItem>
+                      <SelectItem value="cc-by">CC BY 4.0</SelectItem>
+                      <SelectItem value="proprietary">Proprietary</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
 
-                <div>
-                  <Label htmlFor="price" className="text-white">Price (Optional)</Label>
-                  <div className="relative">
-                    <Input
-                      id="price"
-                      type="number"
-                      value={formData.price}
-                      onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                      className="bg-black/30 border-gray-600 text-white pr-16"
-                      placeholder="150"
-                      min="0"
-                    />
-                    <div className="absolute right-3 top-1/2 transform -translate-y-1/2 flex items-center gap-1">
-                      <Coins className="h-4 w-4 text-gray-400" />
-                      <span className="text-gray-400 text-sm">MEMO</span>
-                    </div>
-                  </div>
-                  <p className="text-gray-400 text-sm mt-1">Leave empty for default pricing (150 MEMO)</p>
+                <div className="space-y-2">
+                  <Label htmlFor="price" className="text-gray-300">Price (Optional - MEMO tokens)</Label>
+                  <Input
+                    id="price"
+                    value={formData.price}
+                    onChange={(e) => handleInputChange("price", e.target.value)}
+                    placeholder="Enter price in MEMO tokens (leave empty for free)"
+                    className="bg-black/20 border-red-500/30 text-white"
+                    type="number"
+                    min="0"
+                  />
                 </div>
-              </div>
 
-              <div>
-                <Label htmlFor="file" className="text-white">Upload File *</Label>
-                <Input
-                  id="file"
-                  type="file"
-                  onChange={handleFileChange}
-                  className="bg-black/30 border-gray-600 text-white file:bg-red-500 file:text-white file:border-0 file:rounded-md"
-                  accept=".csv,.json,.txt,.pdf,.zip"
-                  required
-                />
-                <p className="text-gray-400 text-sm mt-1">Supported formats: CSV, JSON, TXT, PDF, ZIP (Max: 100MB)</p>
-              </div>
+                <div className="space-y-2">
+                  <Label htmlFor="file" className="text-gray-300">Upload File</Label>
+                  <div className="border-2 border-dashed border-red-500/30 rounded-lg p-6 text-center">
+                    <input
+                      id="file"
+                      type="file"
+                      onChange={handleFileChange}
+                      className="hidden"
+                      accept=".csv,.json,.txt,.pdf,.zip,.tar.gz"
+                      required
+                    />
+                    <label htmlFor="file" className="cursor-pointer">
+                      <FileText className="h-12 w-12 text-red-400 mx-auto mb-4" />
+                      <p className="text-gray-300 mb-2">
+                        {formData.file ? formData.file.name : "Click to upload your dataset"}
+                      </p>
+                      <p className="text-gray-500 text-sm">
+                        Supports: CSV, JSON, TXT, PDF, ZIP, TAR.GZ (Max 100MB)
+                      </p>
+                    </label>
+                  </div>
+                </div>
 
-              <div className="flex gap-4">
-                <Button
+                <Button 
                   type="submit"
-                  className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
+                  className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+                  disabled={isSubmitting}
                 >
-                  <Upload className="h-4 w-4 mr-2" />
-                  Submit Dataset
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Verifying Dataset...
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="h-4 w-4 mr-2" />
+                      Submit Dataset
+                    </>
+                  )}
                 </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="border-red-500 text-red-300 hover:bg-red-500/10"
-                >
-                  Save as Draft
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+              </form>
+            </CardContent>
+          </Card>
+        </div>
 
         {/* Verification Dialog */}
         <Dialog open={showVerificationDialog} onOpenChange={setShowVerificationDialog}>
           <DialogContent className="bg-black/90 border-red-500/30 text-white max-w-md">
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
-                {isVerifying ? (
+                {isSubmitting ? (
                   <>
                     <Loader2 className="h-5 w-5 animate-spin" />
-                    Smart Contract Verification
+                    Blockchain Verification
                   </>
                 ) : (
                   <>
@@ -287,35 +277,35 @@ const DataSubmission = () => {
               </DialogTitle>
             </DialogHeader>
             
-            {isVerifying ? (
+            {isSubmitting ? (
               <div className="space-y-4">
                 <div className="flex items-center gap-2 text-yellow-400">
-                  <Clock className="h-4 w-4" />
-                  <span>Verifying dataset integrity...</span>
+                  <Upload className="h-4 w-4" />
+                  <span>Verifying dataset on blockchain...</span>
                 </div>
                 <p className="text-gray-300 text-sm">
-                  Your dataset is being verified on the blockchain. This process takes approximately 1 minute to ensure data integrity and authenticity.
+                  Your dataset is being verified through our smart contract system. This process ensures data integrity and authenticity.
                 </p>
                 <div className="bg-black/30 p-4 rounded-lg">
-                  <p className="text-xs text-gray-400">Transaction Hash:</p>
+                  <p className="text-xs text-gray-400">Verification Hash:</p>
                   <p className="text-xs font-mono text-green-400">0x{Math.random().toString(16).substr(2, 40)}</p>
                 </div>
               </div>
-            ) : verificationComplete && submittedDataset ? (
+            ) : verificationComplete ? (
               <div className="space-y-4">
                 <div className="text-center">
                   <CheckCircle className="h-16 w-16 text-green-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold text-green-400 mb-2">Dataset Verified Successfully!</h3>
+                  <h3 className="text-lg font-semibold text-green-400 mb-2">Dataset Verified!</h3>
                 </div>
                 
                 <div className="bg-black/30 p-4 rounded-lg space-y-3">
                   <div>
-                    <p className="text-sm text-gray-400">Dataset Title:</p>
-                    <p className="text-white font-medium">{submittedDataset.title}</p>
+                    <p className="text-sm text-gray-400">Dataset:</p>
+                    <p className="text-white font-medium">{formData.title}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-400">Verification Hash:</p>
-                    <p className="text-xs font-mono text-green-400">{submittedDataset.verificationHash}</p>
+                    <p className="text-sm text-gray-400">Category:</p>
+                    <p className="text-white">{formData.category}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Reward Earned:</p>
@@ -323,25 +313,16 @@ const DataSubmission = () => {
                   </div>
                   <div>
                     <p className="text-sm text-gray-400">Status:</p>
-                    <Badge className="bg-green-500/20 text-green-400">Listed on Marketplace</Badge>
+                    <p className="text-green-400">✓ Listed on Marketplace</p>
                   </div>
                 </div>
                 
-                <div className="flex gap-2">
-                  <Button 
-                    onClick={() => navigate('/marketplace')}
-                    className="flex-1 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
-                  >
-                    View in Marketplace
-                  </Button>
-                  <Button 
-                    onClick={closeDialog}
-                    variant="outline" 
-                    className="flex-1 border-red-500 text-red-300 hover:bg-red-500/10"
-                  >
-                    Close
-                  </Button>
-                </div>
+                <Button 
+                  onClick={closeDialog}
+                  className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700"
+                >
+                  Continue
+                </Button>
               </div>
             ) : null}
           </DialogContent>

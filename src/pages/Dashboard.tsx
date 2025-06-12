@@ -2,35 +2,69 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Brain, Database, FileText, Coins, Users, Upload, Download, Wallet, TrendingUp, ShoppingCart } from "lucide-react";
+import { Brain, Database, FileText, Coins, Users, Upload, Download, Wallet, ShoppingCart } from "lucide-react";
 import DashboardNav from "@/components/DashboardNav";
 import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [stats, setStats] = useState({
-    totalEarnings: "2,485.67",
-    datasetsUploaded: 23,
-    totalDownloads: 1247,
-    stakedAmount: "1,250.00",
-    yieldEarned: "156.25"
+    totalEarnings: "0",
+    datasetsUploaded: 0,
+    totalDownloads: 0
   });
 
   useEffect(() => {
-    // Update earnings from localStorage
-    const totalEarnings = localStorage.getItem('totalEarnings');
-    if (totalEarnings) {
-      setStats(prev => ({ ...prev, totalEarnings }));
-    }
+    // Load live data from localStorage
+    const totalEarnings = localStorage.getItem('totalEarnings') || '0';
+    const datasetsUploaded = parseInt(localStorage.getItem('datasetsUploaded') || '0');
+    const totalDownloads = parseInt(localStorage.getItem('totalDownloads') || '0');
+    
+    setStats({
+      totalEarnings,
+      datasetsUploaded,
+      totalDownloads
+    });
   }, []);
 
   const handleConnectWallet = () => {
-    console.log("Connect wallet clicked");
+    toast({
+      title: "Connect Wallet",
+      description: "Wallet connection feature will be available soon.",
+    });
   };
 
   const handleBuyTokens = () => {
-    console.log("Buy tokens clicked");
+    // Simulate buying 100 MEMO tokens
+    const currentEarnings = parseFloat(localStorage.getItem('totalEarnings') || '0');
+    const newEarnings = currentEarnings + 100;
+    localStorage.setItem('totalEarnings', newEarnings.toString());
+    
+    setStats(prev => ({ 
+      ...prev, 
+      totalEarnings: newEarnings.toString() 
+    }));
+    
+    toast({
+      title: "Tokens Purchased!",
+      description: "Successfully purchased 100 MEMO tokens.",
+    });
+  };
+
+  const handleStakeTokens = () => {
+    toast({
+      title: "Stake Tokens",
+      description: "Token staking feature will be available soon.",
+    });
+  };
+
+  const handleUnstakeTokens = () => {
+    toast({
+      title: "Unstake Tokens",
+      description: "Token unstaking feature will be available soon.",
+    });
   };
 
   return (
@@ -67,7 +101,7 @@ const Dashboard = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="bg-gradient-to-br from-red-800/60 to-red-900/60 border-red-600/50">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
@@ -77,7 +111,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">{stats.totalEarnings} MEMO</div>
-              <p className="text-green-400 text-sm">+12.5% this month</p>
+              <p className="text-gray-400 text-sm">Live balance</p>
             </CardContent>
           </Card>
 
@@ -90,7 +124,7 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">{stats.datasetsUploaded}</div>
-              <p className="text-green-400 text-sm">+3 this week</p>
+              <p className="text-gray-400 text-sm">Your contributions</p>
             </CardContent>
           </Card>
 
@@ -103,65 +137,32 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-white">{stats.totalDownloads}</div>
-              <p className="text-green-400 text-sm">+89 this week</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-purple-800/60 to-purple-900/60 border-purple-600/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
-                <TrendingUp className="h-5 w-5" />
-                Staked MEMO
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{stats.stakedAmount}</div>
-              <p className="text-purple-400 text-sm">12% APY</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-gradient-to-br from-green-800/60 to-green-900/60 border-green-600/50">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-medium text-white flex items-center gap-2">
-                <Coins className="h-5 w-5" />
-                Yield Earned
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold text-white">{stats.yieldEarned}</div>
-              <p className="text-green-400 text-sm">This month</p>
+              <p className="text-gray-400 text-sm">Your dataset downloads</p>
             </CardContent>
           </Card>
         </div>
 
-        {/* Stake & Yield Section */}
+        {/* Stake & Token Management */}
         <Card className="bg-gradient-to-br from-purple-900/80 to-purple-800/80 border-purple-500/30 mb-8">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              Stake & Yield
+              <Coins className="h-5 w-5" />
+              Token Management
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-white mb-2">{stats.stakedAmount}</div>
-                <p className="text-gray-300">Total Staked</p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-green-400 mb-2">12%</div>
-                <p className="text-gray-300">Current APY</p>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-purple-400 mb-2">{stats.yieldEarned}</div>
-                <p className="text-gray-300">Rewards Earned</p>
-              </div>
-            </div>
-            <div className="flex gap-4 mt-6 justify-center">
-              <Button className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800">
+            <div className="flex gap-4 justify-center">
+              <Button 
+                onClick={handleStakeTokens}
+                className="bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800"
+              >
                 Stake Tokens
               </Button>
-              <Button variant="outline" className="border-purple-500 text-purple-300 hover:bg-purple-500/10">
+              <Button 
+                onClick={handleUnstakeTokens}
+                variant="outline" 
+                className="border-purple-500 text-purple-300 hover:bg-purple-500/10"
+              >
                 Unstake
               </Button>
             </div>

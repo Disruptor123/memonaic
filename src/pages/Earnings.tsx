@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,22 +16,21 @@ const Earnings = () => {
   const [withdrawComplete, setWithdrawComplete] = useState(false);
   const [showWithdrawDialog, setShowWithdrawDialog] = useState(false);
   const [earningsData, setEarningsData] = useState({
-    total: "2485.67",
-    monthly: "324.89",
-    weekly: "78.45"
+    total: "0",
+    monthly: "0",
+    weekly: "0"
   });
 
   useEffect(() => {
-    // Update earnings from localStorage
-    const totalEarnings = localStorage.getItem('totalEarnings');
-    if (totalEarnings) {
-      setEarningsData(prev => ({ 
-        ...prev, 
-        total: totalEarnings,
-        monthly: (parseFloat(totalEarnings) * 0.13).toFixed(2),
-        weekly: (parseFloat(totalEarnings) * 0.032).toFixed(2)
-      }));
-    }
+    // Load live earnings from localStorage
+    const totalEarnings = localStorage.getItem('totalEarnings') || '0';
+    const totalValue = parseFloat(totalEarnings);
+    
+    setEarningsData({
+      total: totalEarnings,
+      monthly: (totalValue * 0.13).toFixed(2),
+      weekly: (totalValue * 0.032).toFixed(2)
+    });
   }, []);
 
   const handleWithdraw = async () => {
@@ -44,12 +44,11 @@ const Earnings = () => {
       
       // Clear earnings after withdrawal
       localStorage.setItem('totalEarnings', '0');
-      setEarningsData(prev => ({ 
-        ...prev, 
+      setEarningsData({ 
         total: "0",
         monthly: "0",
         weekly: "0"
-      }));
+      });
       
       toast({
         title: "Withdrawal Successful!",
@@ -63,61 +62,24 @@ const Earnings = () => {
     setWithdrawComplete(false);
   };
 
-  const recentEarnings = [
-    {
-      id: 1,
-      type: "Dataset Upload Reward",
-      dataset: "AI Training Dataset",
-      amount: "1560.00",
-      date: new Date().toISOString().split('T')[0],
-      status: "completed"
-    },
-    {
-      id: 2,
-      type: "Dataset Download",
-      dataset: "Climate Research Data",
-      amount: "25.50",
-      date: "2024-01-15",
-      status: "completed"
-    },
-    {
-      id: 3,
-      type: "Verification Reward",
-      dataset: "Medical Images Dataset",
-      amount: "15.00",
-      date: "2024-01-14",
-      status: "completed"
-    },
-    {
-      id: 4,
-      type: "Royalty Payment",
-      dataset: "NLP Training Data",
-      amount: "45.75",
-      date: "2024-01-13",
-      status: "completed"
-    }
-  ];
+  // Get user's uploaded datasets for recent earnings
+  const userDatasets = JSON.parse(localStorage.getItem('userDatasets') || '[]');
+  const recentEarnings = userDatasets.map((dataset: any, index: number) => ({
+    id: index + 1,
+    type: "Dataset Upload Reward",
+    dataset: dataset.title,
+    amount: "1560.00",
+    date: new Date(dataset.uploadDate).toISOString().split('T')[0],
+    status: "completed"
+  }));
 
-  const topDatasets = [
-    {
-      name: "Large Language Model Dataset",
-      earnings: "1560.00",
-      downloads: 1,
-      growth: "+100%"
-    },
-    {
-      name: "Computer Vision Training Data",
-      earnings: "234.56",
-      downloads: 45,
-      growth: "+8%"
-    },
-    {
-      name: "Scientific Research Papers",
-      earnings: "189.34",
-      downloads: 67,
-      growth: "+15%"
-    }
-  ];
+  // Top performing datasets based on user's uploads
+  const topDatasets = userDatasets.slice(0, 3).map((dataset: any) => ({
+    name: dataset.title,
+    earnings: "1560.00",
+    downloads: dataset.downloads || 0,
+    growth: "+100%"
+  }));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-red-900 to-slate-900">
@@ -143,7 +105,7 @@ const Earnings = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-white">{earningsData.total}</div>
-              <p className="text-green-400 text-sm">MEMO tokens</p>
+              <p className="text-gray-400 text-sm">MEMO tokens</p>
             </CardContent>
           </Card>
 
@@ -156,7 +118,7 @@ const Earnings = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-white">{earningsData.monthly}</div>
-              <p className="text-green-400 text-sm">+18% from last month</p>
+              <p className="text-gray-400 text-sm">Estimated monthly</p>
             </CardContent>
           </Card>
 
@@ -169,7 +131,7 @@ const Earnings = () => {
             </CardHeader>
             <CardContent>
               <div className="text-3xl font-bold text-white">{earningsData.weekly}</div>
-              <p className="text-green-400 text-sm">+25% from last week</p>
+              <p className="text-gray-400 text-sm">Estimated weekly</p>
             </CardContent>
           </Card>
         </div>
@@ -182,27 +144,33 @@ const Earnings = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {recentEarnings.map((earning) => (
-                  <div key={earning.id} className="flex items-center justify-between p-4 bg-black/30 rounded-lg">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <span className="text-white font-medium">{earning.type}</span>
-                        <Badge 
-                          variant="default"
-                          className="bg-green-500/20 text-green-400"
-                        >
-                          {earning.status}
-                        </Badge>
+                {recentEarnings.length > 0 ? (
+                  recentEarnings.map((earning) => (
+                    <div key={earning.id} className="flex items-center justify-between p-4 bg-black/30 rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-white font-medium">{earning.type}</span>
+                          <Badge 
+                            variant="default"
+                            className="bg-green-500/20 text-green-400"
+                          >
+                            {earning.status}
+                          </Badge>
+                        </div>
+                        <p className="text-gray-300 text-sm">{earning.dataset}</p>
+                        <p className="text-gray-400 text-xs">{earning.date}</p>
                       </div>
-                      <p className="text-gray-300 text-sm">{earning.dataset}</p>
-                      <p className="text-gray-400 text-xs">{earning.date}</p>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-green-400">+{earning.amount}</div>
+                        <p className="text-gray-400 text-xs">MEMO</p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-lg font-bold text-green-400">+{earning.amount}</div>
-                      <p className="text-gray-400 text-xs">MEMO</p>
-                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-400">No earnings yet. Upload datasets to start earning!</p>
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
@@ -214,25 +182,31 @@ const Earnings = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {topDatasets.map((dataset, index) => (
-                  <div key={index} className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-white font-medium">{dataset.name}</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-green-400 text-sm">{dataset.growth}</span>
-                        <TrendingUp className="h-4 w-4 text-green-400" />
+                {topDatasets.length > 0 ? (
+                  topDatasets.map((dataset, index) => (
+                    <div key={index} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-white font-medium">{dataset.name}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-green-400 text-sm">{dataset.growth}</span>
+                          <TrendingUp className="h-4 w-4 text-green-400" />
+                        </div>
                       </div>
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-300">{dataset.downloads} downloads</span>
+                        <span className="text-green-400 font-bold">{dataset.earnings} MEMO</span>
+                      </div>
+                      <Progress 
+                        value={(parseFloat(dataset.earnings) / 2000) * 100} 
+                        className="h-2 bg-gray-700"
+                      />
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-300">{dataset.downloads} downloads</span>
-                      <span className="text-green-400 font-bold">{dataset.earnings} MEMO</span>
-                    </div>
-                    <Progress 
-                      value={(parseFloat(dataset.earnings) / 2000) * 100} 
-                      className="h-2 bg-gray-700"
-                    />
+                  ))
+                ) : (
+                  <div className="text-center py-8">
+                    <p className="text-gray-400">No datasets uploaded yet.</p>
                   </div>
-                ))}
+                )}
               </div>
             </CardContent>
           </Card>
