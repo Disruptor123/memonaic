@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -192,7 +191,7 @@ const Earnings = () => {
         </div>
 
         {/* Withdrawal Section */}
-        <Card className="bg-gradient-to-br from-red-600/20 to-orange-600/20 border-red-500/30 mt-8">
+        <Card className="bg-red-900/80 border-red-500/30 mt-8">
           <CardHeader>
             <CardTitle className="text-white flex items-center gap-2">
               <Coins className="h-5 w-5" />
