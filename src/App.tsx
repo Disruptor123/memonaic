@@ -1,4 +1,5 @@
-
+import { Web3Provider } from '@avalabs/builderkit';
+import { avalanche, avalancheFuji } from '@wagmi/core/chains'
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,9 +15,14 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
-
+const chains = [avalanche, avalancheFuji];
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+   <Web3Provider
+    appName="memonaic"
+    projectId="4bd0cc5b065ff2e0cebfe87a8586139b"
+    chains={chains}
+  >
+    <QueryClientProvider client={queryClient}>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -35,6 +41,7 @@ const App = () => (
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>
+  </Web3Provider>
 );
 
 export default App;

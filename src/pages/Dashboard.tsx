@@ -6,6 +6,8 @@ import { Brain, Database, FileText, Coins, Users, Upload, Download, Wallet, Shop
 import DashboardNav from "@/components/DashboardNav";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { ConnectButton} from '@avalabs/builderkit';
+
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -28,14 +30,6 @@ const Dashboard = () => {
       totalDownloads
     });
   }, []);
-
-  const handleConnectWallet = () => {
-    toast({
-      title: "Connect Wallet",
-      description: "Wallet connection feature will be available soon.",
-    });
-  };
-
   const handleBuyTokens = () => {
     // Simulate buying 100 MEMO tokens
     const currentEarnings = parseFloat(localStorage.getItem('totalEarnings') || '0');
@@ -82,13 +76,11 @@ const Dashboard = () => {
               <p className="text-gray-300">Manage your AI datasets, research papers, and earnings</p>
             </div>
             <div className="flex gap-4">
-              <Button 
-                onClick={handleConnectWallet}
-                className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-              >
-                <Wallet className="h-4 w-4 mr-2" />
-                Connect Wallet
-              </Button>
+             <ConnectButton 
+                showConnectedWallet={true}
+                checkWrongNetwork={true}
+                className="bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white font-semibold py-4 px-8 rounded-full transition-all duration-300 hover:scale-105 shadow-lg hover:shadow-red-500/25"
+              />
               <Button 
                 onClick={handleBuyTokens}
                 className="bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
